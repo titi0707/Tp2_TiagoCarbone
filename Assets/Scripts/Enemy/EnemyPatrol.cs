@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    [Header("Punto de destino (coordenadas en el mundo)")]
+    
     [SerializeField] private Vector3 puntoB;
 
-    [Header("Movimiento")]
+    
     [SerializeField] private float velocidadMovimiento = 2f;
     [SerializeField] private float tiempoEsperaEnPunto = 1.5f;
 
@@ -16,7 +16,7 @@ public class EnemyPatrol : MonoBehaviour
 
     private void Start()
     {
-        puntoA = transform.position; 
+        puntoA = transform.position;
         puntoObjetivoActual = puntoB;
     }
 
@@ -46,16 +46,29 @@ public class EnemyPatrol : MonoBehaviour
         {
             esperando = true;
             temporizadorEspera = tiempoEsperaEnPunto;
-            
             puntoObjetivoActual = (puntoObjetivoActual == puntoB) ? puntoA : puntoB;
         }
     }
 
-   
+    public void EstablecerNuevoRecorrido(Vector3 centro, float distancia = 3f)
+    {
+        float anguloAleatorio = Random.Range(0f, 360f);
+        Vector3 direccion = Quaternion.Euler(0f, anguloAleatorio, 0f) * Vector3.forward;
+
+        puntoA = centro - direccion * distancia;
+        puntoB = centro + direccion * distancia;
+        puntoObjetivoActual = puntoB;
+        esperando = false;
+        temporizadorEspera = 0f;
+    }
+
     private void OnDrawGizmos()
     {
+       
+        Vector3 origen = Application.isPlaying ? puntoA : transform.position;
+
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, puntoB);
+        Gizmos.DrawLine(origen, puntoB);
         Gizmos.DrawSphere(puntoB, 0.15f);
     }
 }
