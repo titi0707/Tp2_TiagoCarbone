@@ -2,10 +2,9 @@ using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    
     [SerializeField] private Vector3 puntoB;
 
-    
+
     [SerializeField] private float velocidadMovimiento = 2f;
     [SerializeField] private float tiempoEsperaEnPunto = 1.5f;
 
@@ -13,36 +12,44 @@ public class EnemyPatrol : MonoBehaviour
     private Vector3 puntoObjetivoActual;
     private float temporizadorEspera = 0f;
     private bool esperando = false;
+    private Rigidbody rb;
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+
         puntoA = transform.position;
         puntoObjetivoActual = puntoB;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (esperando)
         {
-            temporizadorEspera -= Time.deltaTime;
+            temporizadorEspera -= Time.fixedDeltaTime;
             if (temporizadorEspera <= 0f)
                 esperando = false;
             return;
         }
-
         MoverHaciaPuntoActual();
     }
 
     private void MoverHaciaPuntoActual()
     {
-        transform.position = Vector3.MoveTowards(transform.position, puntoObjetivoActual, velocidadMovimiento * Time.deltaTime);
+        Vector3 destino = puntoObjetivoActual;
+        destino.y = transform.position.y;
 
-        Vector3 direccion = puntoObjetivoActual - transform.position;
+        Vector3 nuevaPosicion = Vector3.MoveTowards(transform.position, destino, velocidadMovimiento * Time.fixedDeltaTime);
+        rb.MovePosition(nuevaPosicion);
+
+        Vector3 direccion = destino - transform.position;
         direccion.y = 0f;
         if (direccion.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.LookRotation(direccion);
+            rb.MoveRotation(Quaternion.LookRotation(direccion));
 
-        if (Vector3.Distance(transform.position, puntoObjetivoActual) < 0.1f)
+        if (Vector3.Distance(transform.position, destino) < 0.1f)
         {
             esperando = true;
             temporizadorEspera = tiempoEsperaEnPunto;
@@ -64,7 +71,6 @@ public class EnemyPatrol : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-       
         Vector3 origen = Application.isPlaying ? puntoA : transform.position;
 
         Gizmos.color = Color.red;
