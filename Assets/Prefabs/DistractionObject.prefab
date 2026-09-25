@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a0f1abf5e6e47c4aa64e108ebbe5ff9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DistractionObject
-  radioRuido: 50
+  radioRuido: 10
   capaEnemigos:
     serializedVersion: 2
     m_Bits: 512
